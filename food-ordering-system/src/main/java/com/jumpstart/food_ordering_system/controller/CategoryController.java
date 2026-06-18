@@ -2,33 +2,53 @@ package com.jumpstart.food_ordering_system.controller;
 
 import com.jumpstart.food_ordering_system.dto.CategoryDto;
 import com.jumpstart.food_ordering_system.service.CategoryService;
+import jakarta.validation.Valid; // Added for validation
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//This is the Controller layer (REST Controller).
-// It acts as the entry point for incoming HTTP requests from clients (like a web browser or Postman). 
-// Its responsibility is to listen to a specific URL path, handle the request, call the Service layer, and return the data.
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // Injecting the CategoryService to access our business logic
     @Autowired
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
-    // This method handles GET requests sent to http://localhost:8085/api/category
     @GetMapping
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
-        List<CategoryDto> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    }
+
+    // [Task 4.2 & 4.3]: Create category with input validation
+    @PostMapping
+    public ResponseEntity<CategoryDto> addCategory(@RequestBody @Valid CategoryDto dto) {
+        CategoryDto createdCategory = categoryService.addCategory(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
+    }
+
+    // [Task 4.4]: Update Category
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestBody @Valid CategoryDto dto) {
+        CategoryDto updatedCategory = categoryService.updateCategory(id, dto);
+        return ResponseEntity.ok(updatedCategory);
+    }
+
+    // [Task 4.5]: Delete Category (Returns 204 No Content)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }
