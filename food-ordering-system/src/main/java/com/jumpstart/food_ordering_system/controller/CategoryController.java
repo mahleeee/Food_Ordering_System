@@ -1,34 +1,55 @@
 package com.jumpstart.food_ordering_system.controller;
 
 import com.jumpstart.food_ordering_system.dto.CategoryDto;
+import com.jumpstart.food_ordering_system.response.Response;
 import com.jumpstart.food_ordering_system.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//This is the Controller layer (REST Controller).
-// It acts as the entry point for incoming HTTP requests from clients (like a web browser or Postman). 
-// Its responsibility is to listen to a specific URL path, handle the request, call the Service layer, and return the data.
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // Injecting the CategoryService to access our business logic
     @Autowired
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
-    // This method handles GET requests sent to http://localhost:8085/api/category
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getAllCategories() {
+    public ResponseEntity<Response<List<CategoryDto>>> getAllCategories() {
         List<CategoryDto> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(Response.success("All categories retrieved successfully", categories));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Response<CategoryDto>> getCategoryById(@PathVariable Long id) {
+        CategoryDto category = categoryService.getCategoryById(id);
+        return ResponseEntity.ok(Response.success("Category retrieved successfully", category));
+    }
+
+    @PostMapping
+    public ResponseEntity<Response<CategoryDto>> addCategory(@RequestBody @Valid CategoryDto dto) {
+        CategoryDto newCategory = categoryService.addCategory(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Response.success("Category created successfully", newCategory));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Response<CategoryDto>> updateCategory(@PathVariable Long id, @RequestBody @Valid CategoryDto dto) {
+        CategoryDto updatedCategory = categoryService.updateCategory(id, dto);
+        return ResponseEntity.ok(Response.success("Category updated successfully", updatedCategory));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Response<Void>> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok(Response.success("Category deleted successfully", null));
     }
 }
