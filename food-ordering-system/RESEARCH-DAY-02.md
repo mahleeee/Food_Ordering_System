@@ -20,3 +20,6 @@ This Jackson annotation ensures that fields containing a `null` value are comple
 
 ### Q7. What is a static factory method? Why use Response.success(...) instead of new Response<>()?
 A static factory method is a static method encapsulated inside a class that returns an instance of that class. Using `Response.success(...)` improves code readability (expresses exact intent), abstracts away initialization values like `LocalDateTime.now()`, and avoids explicit duplication of complex generic diamond operators during object instantiation.
+
+## End of Day 02 Research
+All tasks completed and verified against the checklist.
