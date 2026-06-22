@@ -17,7 +17,9 @@ public class Response<T> {
     private String message;
     private T data;
     private LocalDateTime timestamp;
-
+    /**
+     * Standard API Response wrapper for the Food Ordering System.
+     */
     public static <T> Response<T> success(String message, T data) {
         return Response.<T>builder()
                 .statusCode(200)
