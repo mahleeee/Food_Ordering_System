@@ -1,0 +1,8 @@
+[33m3f8dbf5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/day-03-menu-entity[m[33m)[m feat(menu): controller (create + read)
+[33mbb21440[m feat(menu): service implementation
+[33ma420667[m feat(menu): service interface
+[33m0cddaed[m feat(menu): MenuDto with validation
+[33m764baea[m feat(menu): MenuRepository
+[33md130d4c[m feat(menu): create Menu entity
+[33m2a76145[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m second commit
+[33me9c2f57[m first commit
