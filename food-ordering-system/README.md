@@ -43,3 +43,45 @@ Part 5: Package Structure Explanation
 5.dto (Data Transfer Object): The data presentation layer. Used to transfer data safely between layers or across the network without exposing internal database structures directly.
 6.config: The configuration layer. Holds classes annotated with `@Configuration` to define custom Spring beans and app setups.
 7.exception: The error handling layer. Contains custom exception classes and global handlers to return clean, user-friendly error responses when something goes wrong.
+
+
+==================================================================================================================================================================================================================================
+==================================================================================================================================================================================================================================
+## Week 2 — Menu Module Documentation
+
+### Endpoint Summary Table
+| Method | Path | Description | Query Parameters |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/menu` | Create a new menu item | None |
+| **GET** | `/api/menu` | List menu items with pagination, sorting, and filtering | `categoryId` (Long), `search` (String), `page` (Integer), `size` (Integer), `sort` (String) |
+| **GET** | `/api/menu/{id}` | Retrieve a single menu item by its ID | None |
+| **PUT** | `/api/menu/{id}` | Update an existing menu item by its ID | None |
+| **DELETE** | `/api/menu/{id}` | Delete a menu item by its ID | None |
+
+### Example GET Request with All Query Parameters
+```http
+GET http://localhost:8085/api/menu?categoryId=1&search=Burger&page=0&size=5&sort=price,desc
+
+{
+    "statusCode": 200,
+    "message": "Menu items retrieved successfully",
+    "data": {
+        "number": 0,
+        "size": 5,
+        "last": false,
+        "totalPages": 3,
+        "menus": [
+            {
+                "id": 1,
+                "name": "Quarter Pounder Burger",
+                "description": "Juicy beef patty with cheese, pickles, and mustard.",
+                "price": 69.90,
+                "imageUrl": "burger_pic.jpg",
+                "categoryId": 1,
+                "categoryName": "Gourmet Burgers"
+            }
+        ],
+        "first": true,
+        "totalElements": 12
+    },
+    "timestamp": "2026-06-27T18:01:01
