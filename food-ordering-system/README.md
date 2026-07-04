@@ -43,3 +43,32 @@ Part 5: Package Structure Explanation
 5.dto (Data Transfer Object): The data presentation layer. Used to transfer data safely between layers or across the network without exposing internal database structures directly.
 6.config: The configuration layer. Holds classes annotated with `@Configuration` to define custom Spring beans and app setups.
 7.exception: The error handling layer. Contains custom exception classes and global handlers to return clean, user-friendly error responses when something goes wrong.
+
+################################################################################################################################################################################
+Week 3: Authentication & Security Summary
+################################################################################################################################################################################
+
+
+### Auth Endpoint Matrix
+| Method | Path | Access Level | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Public | Registers a new account (Defaults to CUSTOMER) |
+| `POST` | `/api/auth/login` | Public | Validates credentials and issues a JWT token |
+| `GET` | `/api/menu/**` | Public | Allows browsing of food items |
+| `GET` | `/api/categories/**` | Public | Allows browsing of categories |
+| `POST/PUT/DELETE` | `/api/menu/**` | ADMIN Only | Administrative menu management |
+| `POST/PUT/DELETE` | `/api/categories/**` | ADMIN Only | Administrative category management |
+
+### 🛠️ Promoting a User to ADMIN
+To manually elevate a registered user to an administrative role via SQL, execute the following statements in your database editor:
+
+```sql
+-- 1. Find the ID of the ADMIN role
+SELECT id FROM roles WHERE name = 'ADMIN';
+
+-- 2. Find the ID of your registered user
+SELECT id FROM users WHERE email = 'amahle@example.com';
+
+-- 3. Link the user to the ADMIN role in the junction table
+-- Replace USER_ID and ROLE_ID with the values found above
+INSERT INTO users_roles (user_id, role_id) VALUES (USER_ID, ROLE_ID);
