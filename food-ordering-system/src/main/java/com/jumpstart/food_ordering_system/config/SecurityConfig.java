@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints (no token needed)
                         .requestMatchers("/api/auth/register", "/api/auth/login","/api/auth/refresh").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**", "/api/menu/**", "/api/reviews/**").permitAll()
 
                         // ADMIN only endpoints (Requires token + ADMIN role)
