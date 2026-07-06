@@ -7,7 +7,10 @@ import com.jumpstart.food_ordering_system.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,5 +37,29 @@ public class AuthController {
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest request) {
         LoginResponse loginResponse = authService.loginUser(request);
         return ResponseEntity.ok(loginResponse);
+    }
+
+    // --- EXTRA CREDIT ENDPOINTS ADDED TO THE BOTTOM ---
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUserProfile() {
+        // 1. Read the email from the SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        // 2. Fetch the clean profile data via authService
+        Object userProfile = authService.getUserProfileByEmail(email);
+        return ResponseEntity.ok(userProfile);
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<?> updateUserProfile(@RequestBody Map<String, Object> updateRequest) {
+        // 1. Read the email from the SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        // 2. Pass the updates to authService to save to MySQL
+        Object updatedProfile = authService.updateUserProfile(email, updateRequest);
+        return ResponseEntity.ok(updatedProfile);
     }
 }

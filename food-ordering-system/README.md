@@ -72,3 +72,12 @@ SELECT id FROM users WHERE email = 'amahle@example.com';
 -- 3. Link the user to the ADMIN role in the junction table
 -- Replace USER_ID and ROLE_ID with the values found above
 INSERT INTO users_roles (user_id, role_id) VALUES (USER_ID, ROLE_ID);
+
+## Promoting a user to ADMIN
+
+To manually promote a registered test user to an administrative role for verification and end-to-end testing, execute the following SQL statement directly against the database:
+
+```sql
+-- Assign the ADMIN role (role_id = 2) to the primary test user (user_id = 1)
+INSERT INTO users_roles (user_id, role_id) 
+VALUES (1, 2);
