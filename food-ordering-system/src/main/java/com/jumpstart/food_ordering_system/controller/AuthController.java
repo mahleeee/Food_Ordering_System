@@ -62,4 +62,14 @@ public class AuthController {
         Object updatedProfile = authService.updateUserProfile(email, updateRequest);
         return ResponseEntity.ok(updatedProfile);
     }
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshMyToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is required"));
+        }
+
+        Map<String, String> newTokens = authService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(newTokens);
+    }
 }

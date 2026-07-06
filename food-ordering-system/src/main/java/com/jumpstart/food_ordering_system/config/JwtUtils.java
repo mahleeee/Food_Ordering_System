@@ -17,15 +17,24 @@ public class JwtUtils {
     @Value("${app.jwt.secret}")
     private String secretKey;
 
-    @Value("${app.jwt.expiration}")
-    private long jwtExpiration;
-
-    // Generate a signed token for a given email
-    public String generateToken(String email) {
+    // 1. Generate a short-lived Access Token (15 Minutes)
+    public String generateAccessToken(String email) {
+        long fifteenMinutesInMillis = 15 * 60 * 1000;
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .expiration(new Date(System.currentTimeMillis() + fifteenMinutesInMillis))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    // 2. Generate a long-lived Refresh Token (7 Days)
+    public String generateRefreshToken(String email) {
+        long sevenDaysInMillis = 7L * 24 * 60 * 60 * 1000;
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + sevenDaysInMillis))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -41,8 +50,13 @@ public class JwtUtils {
         return (extractedEmail.equals(email) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+    // Helper to validate a token format/expiration stand-alone
+    public boolean isTokenExpired(String token) {
+        try {
+            return extractClaim(token, Claims::getExpiration).before(new Date());
+        } catch (Exception e) {
+            return true; // If parsing fails or is tampered with, treat as expired/invalid
+        }
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

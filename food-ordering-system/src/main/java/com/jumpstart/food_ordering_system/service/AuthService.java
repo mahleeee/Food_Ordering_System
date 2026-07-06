@@ -48,7 +48,6 @@ public class AuthService {
         userRepository.save(newUser);
         return "User registered successfully";
     }
-
     public LoginResponse loginUser(LoginRequest request) {
         // 1. Find user by email. If missing, return generic error message for security
         User user = userRepository.findByEmail(request.getEmail())
@@ -64,17 +63,19 @@ public class AuthService {
             throw new RuntimeException("Account inactive. Please contact support.");
         }
 
-        // 4. Generate JWT token using our utility
-        String token = jwtUtils.generateToken(user.getEmail());
+        // 4. Generate BOTH short-lived Access and long-lived Refresh tokens using our utility
+        String accessToken = jwtUtils.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail());
 
         // 5. Extract role names
         List<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toList());
 
-        // 6. Return response package
+        // 6. Return response package with both tokens included
         return LoginResponse.builder()
-                .token(token)
+                .token(accessToken)
+                .refreshToken(refreshToken)
                 .email(user.getEmail())
                 .name(user.getName())
                 .roles(roles)
@@ -119,5 +120,30 @@ public class AuthService {
         profile.put("address", user.getAddress());
         profile.put("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
         return profile;
+    }
+    public Map<String, String> refreshAccessToken(String refreshToken) {
+        // 1. Verify the refresh token is not expired/tampered with
+        if (jwtUtils.isTokenExpired(refreshToken)) {
+            throw new RuntimeException("Refresh token is expired or invalid. Please log in again.");
+        }
+
+        // 2. Extract user email from the refresh token
+        String email = jwtUtils.extractEmail(refreshToken);
+
+        // 3. Ensure user exists and is still active in system
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.isActive()) {
+            throw new RuntimeException("Account is inactive.");
+        }
+
+        // 4. Issue a shiny new 15-minute access token
+        String newAccessToken = jwtUtils.generateAccessToken(email);
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("token", newAccessToken);
+        tokens.put("refreshToken", refreshToken); // Keep using the same 7-day refresh token
+        return tokens;
     }
 }
