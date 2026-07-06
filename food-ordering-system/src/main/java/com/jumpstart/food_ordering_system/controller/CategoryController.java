@@ -14,7 +14,7 @@ import java.util.List;
 // It acts as the entry point for incoming HTTP requests from clients (like a web browser or Postman). 
 // Its responsibility is to listen to a specific URL path, handle the request, call the Service layer, and return the data.
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
