@@ -13,7 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,5 +79,45 @@ public class AuthService {
                 .name(user.getName())
                 .roles(roles)
                 .build();
+    }
+
+    // --- EXTRA CREDIT SERVICE IMPLEMENTATIONS ---
+
+    public Map<String, Object> getUserProfileByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User profile not found"));
+
+        return convertToProfileMap(user);
+    }
+
+    public Map<String, Object> updateUserProfile(String email, Map<String, Object> updates) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User profile not found"));
+
+        // Update ONLY permitted fields (Ignore email/password modifications if passed)
+        if (updates.containsKey("name")) {
+            user.setName((String) updates.get("name"));
+        }
+        if (updates.containsKey("phoneNumber")) {
+            user.setPhoneNumber((String) updates.get("phoneNumber"));
+        }
+        if (updates.containsKey("address")) {
+            user.setAddress((String) updates.get("address"));
+        }
+
+        User updatedUser = userRepository.save(user);
+        return convertToProfileMap(updatedUser);
+    }
+
+    // Helper method to keep code DRY and hide password data
+    private Map<String, Object> convertToProfileMap(User user) {
+        Map<String, Object> profile = new HashMap<>();
+        profile.put("id", user.getId());
+        profile.put("name", user.getName());
+        profile.put("email", user.getEmail());
+        profile.put("phoneNumber", user.getPhoneNumber());
+        profile.put("address", user.getAddress());
+        profile.put("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
+        return profile;
     }
 }
